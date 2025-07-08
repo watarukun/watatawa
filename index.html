@@ -1,45 +1,27 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<link rel="icon" href="icon.png" type="image/x-icon">
-<meta charset="UTF-8">
-<title>watatawa Software</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="ページの説明">
-<meta name="keywords" content="ページのキーワードA,B,C">
-<link rel="stylesheet" href="index.css">
+  <meta charset="UTF-8">
+  <title>掲示板</title>
 </head>
 <body>
-<div id="outer">
-<header><div id="header-inner"><h1>watatawa Software</h1><a href="download.html">ダウンロード</a><a href="post.html">掲示板</a>
-</div></header>
-<main><div id="text">
-<h2>トップページ</h2>
-<p>NSWR　[NEW SUPER わたたわRPG]最新版ダウンロードはこちら</p>
-  <a href="">NSWR Setup.exe x64 ver3.0</a>
-  <p>temp</p>
-  <a href="">temp</a>
- 
-<p>文章</p>
-<h4>お知らせ</h4>
-  <h3>情報</h3>
-  
-<p>開発状況</p>
-  
+  <h1>掲示板</h1>
+  <form method="POST" action="/post">
+    <input type="text" name="name" required placeholder="名前">
+    <textarea name="message" required placeholder="メッセージ"></textarea>
+    <button type="submit">投稿</button>
+  </form>
 
-<p>
-  ご不明な点もしくは要望などがありましたら以下のメールアドレスまでお問い合わせください watatawa2010@icloud.com</a>
-</p>
+  <h2>投稿一覧</h2>
+  <div id="posts"></div>
 
-</div>
-</main>
-<aside>
-<div class="side-title">menu</div>
-<div class="side">
-<ul>
- 
-
-</ul>
-</div>
-</aside>
-<footer>all rights reserved ©watatawa Software 2021~2025</footer>
+  <script>
+    fetch('/posts')
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById('posts').innerHTML =
+          data.map(p => `<p><strong>${p.name}</strong>: ${p.message}</p>`).join('');
+      });
+  </script>
+</body>
+</html>
