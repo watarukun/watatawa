@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>掲示板</title>
+</head>
+<body>
+  <h1>掲示板</h1>
+  <form method="POST" action="/post">
+    <input type="text" name="name" placeholder="名前" required><br>
+    <textarea name="message" placeholder="メッセージ" required></textarea><br>
+    <button type="submit">投稿</button>
+  </form>
+
+  <h2>投稿一覧</h2>
+  <div id="posts"></div>
+
+  <script>
+    fetch('/posts')
+      .then(res => res.json())
+      .then(posts => {
+        document.getElementById('posts').innerHTML = posts
+          .map(p => `<p><strong>${p.name}</strong>: ${p.message}</p>`)
+          .join('');
+      });
+  </script>
+</body>
+</html>
