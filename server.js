@@ -16,10 +16,10 @@ const server = http.createServer((req, res) => {
 
   // HTMLページ
   if (req.method === 'GET' && parsedUrl.pathname === '/') {
-    fs.readFile('index.html', (err, data) => {
+    fs.readFile('post.html', (err, data) => {
       if (err) {
         res.writeHead(500);
-        return res.end('Error loading index.html');
+        return res.end('Error loading post.html');
       }
       res.writeHead(200, { 'Content-Type': 'text/html' });
       res.end(data);
