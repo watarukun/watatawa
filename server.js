@@ -6,7 +6,6 @@ const querystring = require('querystring');
 const port = 3000;
 const postsFile = 'posts.json';
 
-// JSONファイルがなければ初期化
 if (!fs.existsSync(postsFile)) {
   fs.writeFileSync(postsFile, '[]');
 }
@@ -14,7 +13,7 @@ if (!fs.existsSync(postsFile)) {
 const server = http.createServer((req, res) => {
   const parsedUrl = url.parse(req.url, true);
 
-  // HTMLページ
+  // HTML画面
   if (req.method === 'GET' && parsedUrl.pathname === '/') {
     fs.readFile('post.html', (err, data) => {
       if (err) {
@@ -24,7 +23,7 @@ const server = http.createServer((req, res) => {
       res.writeHead(200, { 'Content-Type': 'text/html' });
       res.end(data);
     });
-  
+
   // 投稿取得API
   } else if (req.method === 'GET' && parsedUrl.pathname === '/posts') {
     fs.readFile(postsFile, (err, data) => {
@@ -39,26 +38,38 @@ const server = http.createServer((req, res) => {
   // 投稿送信処理
   } else if (req.method === 'POST' && parsedUrl.pathname === '/post') {
     let body = '';
-    req.on('data', chunk => {
-      body += chunk.toString();
-    });
+    req.on('data', chunk => { body += chunk.toString(); });
     req.on('end', () => {
       const parsed = querystring.parse(body);
       const name = parsed.name;
       const message = parsed.message;
 
-      fs.readFile(postsFile, (err, data) => {
-        const posts = err ? [] : JSON.parse(data);
-        posts.unshift({ name, message }); // 新しい投稿を先頭に
-        fs.writeFile(postsFile, JSON.stringify(posts, null, 2), () => {
-          // リダイレクトでトップに戻す
-          res.writeHead(302, { 'Location': '/' });
-          res.end();
-        });
+      if (!name || !message) {
+        res.writeHead(400);
+        return res.end('Missing name or message');
+      }
+
+      const posts = JSON.parse(fs.readFileSync(postsFile, 'utf8'));
+      posts.unshift({ name, message });
+
+      fs.writeFile(postsFile, JSON.stringify(posts, null, 2), () => {
+        res.writeHead(302, { Location: '/' });
+        res.end();
       });
     });
 
-  // ファイルなし
+  // CSS対応
+  } else if (req.method === 'GET' && parsedUrl.pathname === '/index.css') {
+    fs.readFile('index.css', (err, data) => {
+      if (err) {
+        res.writeHead(404);
+        return res.end('CSS not found');
+      }
+      res.writeHead(200, { 'Content-Type': 'text/css' });
+      res.end(data);
+    });
+
+  // その他404
   } else {
     res.writeHead(404);
     res.end('404 Not Found');
